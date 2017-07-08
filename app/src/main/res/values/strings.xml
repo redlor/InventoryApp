@@ -34,5 +34,5 @@
     <string name="editor_delete_product_failed">Error with deleting product</string>
     <string name="editor_delete_product_successful">Product deleted</string>
     <string name="negative_quantity_check">Can\'t set a negative quantity</string>
-
+    <string name="picture_check">picture requested</string>
 </resources>

@@ -3,7 +3,6 @@ package com.example.android.inventoryapp;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import com.example.android.inventoryapp.data.ProductContract.ProductEntry;
 
 import static android.R.attr.id;
+import static com.example.android.inventoryapp.R.id.price;
 
 public class ProductCursorAdapter extends CursorAdapter {
 
@@ -34,12 +34,10 @@ public class ProductCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        final int mQuantity;
-
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView quantityTextView = (TextView) view.findViewById(R.id.quantity);
-        TextView priceTextView = (TextView) view.findViewById(R.id.price);
+        TextView priceTextView = (TextView) view.findViewById(price);
         ImageView productImage = (ImageView) view.findViewById(R.id.product_image);
         Button sellProduct = (Button) view.findViewById(R.id.soldProduct);
 
@@ -48,19 +46,18 @@ public class ProductCursorAdapter extends CursorAdapter {
         int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY);
         int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE);
         int imageColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_IMAGE);
-        Log.d("ProductCursorAdapter", "message:"+ imageColumnIndex);
+
         // Read the product attributes from the Cursor for the current product
         String productName = cursor.getString(nameColumnIndex);
         final int quantity = cursor.getInt(quantityColumnIndex);
+        String productQuantity = String.valueOf(quantity);
         String price = cursor.getString(priceColumnIndex);
-        String imageUriString = cursor.getString(imageColumnIndex);
-        Uri imageUri = Uri.parse(imageUriString);
+        Uri imageUri = Uri.parse(cursor.getString(imageColumnIndex));
 
-        mQuantity = quantity;
 
-        // Update the TextViews with the attributes for the current pet
+        // Update the TextViews with the attributes for the current product
         nameTextView.setText(productName);
-        quantityTextView.setText(quantity);
+        quantityTextView.setText(productQuantity);
         priceTextView.setText(price);
         productImage.setImageURI(imageUri);
         productImage.invalidate();
@@ -69,7 +66,7 @@ public class ProductCursorAdapter extends CursorAdapter {
             @Override
             public void onClick(View v) {
                 if (quantity > 0) {
-                    invAct.sellProduct(id, mQuantity);
+                    invAct.sellProduct(id, quantity);
                 } else {
                     Toast.makeText(invAct, "Quantity wrong", Toast.LENGTH_SHORT).show();
                 }

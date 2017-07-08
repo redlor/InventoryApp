@@ -161,7 +161,7 @@ protected void onCreate(Bundle savedInstanceState) {
             if (data != null) {
                 mImageUri = data.getData();
                 mProductImage.setImageURI(mImageUri);
-          //      mProductImage.invalidate();
+                mProductImage.invalidate();
             }
         }
     }
@@ -299,7 +299,11 @@ protected void onCreate(Bundle savedInstanceState) {
         values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
         values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantityString);
         values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceString);
-        values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, mProductImage.toString());
+
+        if (mImageUri == null) {
+            Toast.makeText(this, getString(R.string.picture_check), Toast.LENGTH_SHORT).show();
+        }
+        values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, mImageUri.toString());
 
         // New product
         if (mCurrentProductUri == null) {
