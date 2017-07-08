@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="@dimen/activity_margin">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/nameColor" />
+
+    <TextView
+        android:id="@+id/quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textColor="@color/quantityColor"  />
+
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textColor="@color/priceColor"  />
+
+  <Button
+      android:id="@+id/soldProduct"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
+</LinearLayout>
