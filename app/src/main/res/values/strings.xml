@@ -19,6 +19,10 @@
     <string name="hint_product_price">Euros</string>
     <string name="add_image_text">Click to add an image of the product</string>
     <string name="change_image_text">Click to change the image of the product</string>
+    <string name="image_needed_text">An image is needed</string>
+    <string name="name_needed_text">A name is needed</string>
+    <string name="quantity_needed_text">Quantity is needed</string>
+    <string name="price_needed_text">Price is needed</string>
     <string name="intentType">image/*</string>
     <string name="selectImage">Select Image</string>
     <string name="unsaved_changes">Product not saved</string>

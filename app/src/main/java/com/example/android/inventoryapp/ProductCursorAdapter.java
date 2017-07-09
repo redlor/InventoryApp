@@ -1,8 +1,11 @@
 package com.example.android.inventoryapp;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +13,14 @@ import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.inventoryapp.data.ProductContract.ProductEntry;
 
-import static android.R.attr.id;
 import static com.example.android.inventoryapp.R.id.price;
 
 public class ProductCursorAdapter extends CursorAdapter {
 
-    private InventoryActivity invAct = new InventoryActivity();
+
 
     public ProductCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
@@ -32,13 +33,15 @@ public class ProductCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(final View view, Context context, Cursor cursor) {
+
+        final Uri currentUri = ProductEntry.CONTENT_URI;
 
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView quantityTextView = (TextView) view.findViewById(R.id.quantity);
         TextView priceTextView = (TextView) view.findViewById(price);
-        ImageView productImage = (ImageView) view.findViewById(R.id.product_image);
+        ImageView productImage = (ImageView) view.findViewById(R.id.image);
         Button sellProduct = (Button) view.findViewById(R.id.soldProduct);
 
         // Find the columns of products attributes that we're interested in
@@ -52,23 +55,25 @@ public class ProductCursorAdapter extends CursorAdapter {
         final int quantity = cursor.getInt(quantityColumnIndex);
         String productQuantity = String.valueOf(quantity);
         String price = cursor.getString(priceColumnIndex);
-        Uri imageUri = Uri.parse(cursor.getString(imageColumnIndex));
-
+        final Uri imageUri = Uri.parse(cursor.getString(imageColumnIndex));
 
         // Update the TextViews with the attributes for the current product
         nameTextView.setText(productName);
         quantityTextView.setText(productQuantity);
         priceTextView.setText(price);
         productImage.setImageURI(imageUri);
+        Log.e("ProductCursorAdapter", "Message: " +imageUri);
         productImage.invalidate();
 
         sellProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ContentResolver resolver = view.getContext().getContentResolver();
+                ContentValues values = new ContentValues();
                 if (quantity > 0) {
-                    invAct.sellProduct(id, quantity);
-                } else {
-                    Toast.makeText(invAct, "Quantity wrong", Toast.LENGTH_SHORT).show();
+                    int mQuantity = quantity;
+                    values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, --mQuantity);
+                    resolver.update(currentUri, values, null, null);
                 }
             }
         });

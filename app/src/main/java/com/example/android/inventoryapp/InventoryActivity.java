@@ -2,7 +2,6 @@ package com.example.android.inventoryapp;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -72,14 +71,6 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
     }
 
-    public void sellProduct(long id, int quantity) {
-        Uri currentProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
-        quantity--;
-        ContentValues values = new ContentValues();
-        values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
-        int rowsAffected = getContentResolver().update(currentProductUri, values, null, null);
-
-    }
 
     private void deleteAllProducts() {
         int rowsDeleted = getContentResolver().delete(ProductEntry.CONTENT_URI, null, null);
@@ -122,8 +113,6 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
                 null,
                 null,
                 null);
-
-
     }
 
     @Override

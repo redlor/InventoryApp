@@ -6,12 +6,19 @@
     android:orientation="horizontal"
     android:padding="@dimen/activity_margin">
 
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginRight="@dimen/activity_margin"/>
+
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:textAppearance="?android:textAppearanceMedium"
+        android:layout_marginRight="@dimen/activity_margin"
         android:textColor="@color/nameColor" />
 
     <TextView
@@ -19,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
+        android:layout_marginRight="@dimen/activity_margin"
         android:textAppearance="?android:textAppearanceSmall"
         android:textColor="@color/quantityColor"  />
 
@@ -28,10 +36,12 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:textAppearance="?android:textAppearanceSmall"
+        android:layout_marginRight="@dimen/activity_margin"
         android:textColor="@color/priceColor"  />
 
   <Button
       android:id="@+id/soldProduct"
+      android:focusable="false"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />
 </LinearLayout>

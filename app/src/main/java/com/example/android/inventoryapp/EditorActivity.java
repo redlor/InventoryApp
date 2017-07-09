@@ -288,23 +288,42 @@ protected void onCreate(Bundle savedInstanceState) {
         String priceString = mPriceEditText.getText().toString().trim();
 
 
-        // Check id it is a new product
+        // Check if it is a new product
         if (mCurrentProductUri == null &&
             TextUtils.isEmpty(nameString) && TextUtils.isEmpty(quantityString) &&
-            TextUtils.isEmpty(priceString)) {
+            TextUtils.isEmpty(priceString) && mImageUri == null) {
             return;
         }
         // Create a ContentValues object
         ContentValues values =  new ContentValues();
-        values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
-        values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantityString);
-        values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceString);
+
+        if (TextUtils.isEmpty(nameString)) {
+            Toast.makeText(this, R.string.name_needed_text, Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
+        }
+
+        if (TextUtils.isEmpty(quantityString)) {
+            Toast.makeText(this, R.string.quantity_needed_text, Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantityString);
+        }
+
+        if (TextUtils.isEmpty(priceString)) {
+            Toast.makeText(this, R.string.price_needed_text, Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceString);
+        }
 
         if (mImageUri == null) {
-            Toast.makeText(this, getString(R.string.picture_check), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.image_needed_text, Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, mImageUri.toString());
         }
-        values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, mImageUri.toString());
-
         // New product
         if (mCurrentProductUri == null) {
             Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
@@ -387,8 +406,8 @@ public void deleteProduct() {
             mNameEditText.setText(name);
             mQuantityEditText.setText(Integer.toString(quantity));
             mPriceEditText.setText(price);
-            Uri imageUri = Uri.parse(imageUriString);
-            mProductImage.setImageURI(imageUri);
+            mImageUri = Uri.parse(imageUriString);
+            mProductImage.setImageURI(mImageUri);
         }
     }
 

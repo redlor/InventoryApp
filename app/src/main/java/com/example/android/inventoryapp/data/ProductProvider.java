@@ -119,10 +119,10 @@ public class ProductProvider extends ContentProvider {
             throw new IllegalArgumentException("Not valid price");
         }
 
-        String imageURi = values.getAsString(ProductEntry.COLUMN_PRODUCT_IMAGE);
+  /*      String imageURi = values.getAsString(ProductEntry.COLUMN_PRODUCT_IMAGE);
         if (imageURi == null) {
-            throw new IllegalArgumentException("Product requires picture");
-        }
+            throw new IllegalArgumentException("Product requires a picture");
+        }*/
 
         // Get writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
@@ -198,23 +198,16 @@ public class ProductProvider extends ContentProvider {
             }
         }
 
-        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_QUANTITY)) {
-            Integer quantity = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_QUANTITY);
-            if (quantity != null && quantity < 0) {
-                throw new IllegalArgumentException("Not valid quantity");
-            }
-        }
-
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_PRICE)) {
             String price = values.getAsString(ProductEntry.COLUMN_PRODUCT_PRICE);
-            if (price != null) {
+            if (price == null) {
                 throw new IllegalArgumentException("Not valid price");
             }
         }
 
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_IMAGE)) {
             String imageUri = values.getAsString(ProductEntry.COLUMN_PRODUCT_PRICE);
-            if (imageUri != null) {
+            if (imageUri == null) {
                 throw new IllegalArgumentException("Not valid image");
             }
         }
