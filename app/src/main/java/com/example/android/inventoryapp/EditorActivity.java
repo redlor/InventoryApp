@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,94 +35,98 @@ import com.example.android.inventoryapp.data.ProductContract.ProductEntry;
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EXISTING_PRODUCT_LOADER = 0;
-
+    int quantity;
     private Uri mCurrentProductUri;
     private Uri mImageUri;
     private EditText mNameEditText;
     private EditText mQuantityEditText;
     private EditText mPriceEditText;
+    private EditText mSupplierEditText;
+    private EditText mSupplierEmailEditText;
     private TextView mImageText;
     private ImageView mProductImage;
     private Button mPlusButton;
     private Button mMinusButton;
-
     private boolean mProductHasChanged;
-
-    int quantity;
-
-private View.OnTouchListener mTouchListener =  new View.OnTouchListener() {
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        mProductHasChanged = true;
-        return false;
-    }
-};
-
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_editor);
-
-    // Check the intent used to reach the activity
-    final Intent intent = getIntent();
-    mCurrentProductUri = intent.getData();
-
-    mNameEditText = (EditText) findViewById(R.id.edit_product_name);
-    mQuantityEditText = (EditText) findViewById(R.id.edit_product_quantity);
-    mPriceEditText = (EditText) findViewById(R.id.edit_product_price);
-    mImageText = (TextView) findViewById(R.id.add_image_text);
-    mProductImage = (ImageView) findViewById(R.id.product_image);
-    mPlusButton = (Button) findViewById(R.id.plus_button);
-    mMinusButton = (Button) findViewById(R.id.minus_button);
-
-    mPlusButton.setOnClickListener(new View.OnClickListener() {
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
-        public void onClick(View v) {
-            quantity++;
-            mQuantityEditText.setText(String.valueOf(quantity));
+        public boolean onTouch(View v, MotionEvent event) {
+            mProductHasChanged = true;
+            return false;
         }
-    });
+    };
 
-    mMinusButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (quantity < 1) {
-                Toast.makeText(getApplicationContext(), "Can't set a negative quantity", Toast.LENGTH_SHORT).show();
-            } else {
-                quantity--;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_editor);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        // Check the intent used to reach the activity
+        final Intent intent = getIntent();
+        mCurrentProductUri = intent.getData();
+
+        mNameEditText = (EditText) findViewById(R.id.edit_product_name);
+        mQuantityEditText = (EditText) findViewById(R.id.edit_product_quantity);
+        mPriceEditText = (EditText) findViewById(R.id.edit_product_price);
+        mSupplierEditText = (EditText) findViewById(R.id.edit_product_supplier);
+        mSupplierEmailEditText = (EditText) findViewById(R.id.edit_product_supplier_email);
+        mImageText = (TextView) findViewById(R.id.add_image_text);
+        mProductImage = (ImageView) findViewById(R.id.product_image);
+        mPlusButton = (Button) findViewById(R.id.plus_button);
+        mMinusButton = (Button) findViewById(R.id.minus_button);
+
+        mPlusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quantity++;
                 mQuantityEditText.setText(String.valueOf(quantity));
             }
-        }
-    });
+        });
 
-    // If the intent does not have data, then it is a new product insertion
-    if (mCurrentProductUri == null) {
-        setTitle(getString(R.string.editor_activity_title_new_product));
-        mImageText.setText(getString(R.string.add_image_text));
-        // Hide the option menu
-        invalidateOptionsMenu();
-    } else {
-        setTitle(getString(R.string.editor_activity_title_edit_product));
-        mImageText.setText(getString(R.string.change_image_text));
-        // Initialize the loader to read product data from the database
-        getLoaderManager().initLoader(EXISTING_PRODUCT_LOADER, null, this);
+        mMinusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (quantity < 1) {
+                    Toast.makeText(getApplicationContext(), "Can't set a negative quantity", Toast.LENGTH_SHORT).show();
+                } else {
+                    quantity--;
+                    mQuantityEditText.setText(String.valueOf(quantity));
+                }
+            }
+        });
+
+        // If the intent does not have data, then it is a new product insertion
+        if (mCurrentProductUri == null) {
+            setTitle(getString(R.string.editor_activity_title_new_product));
+            mImageText.setText(getString(R.string.add_image_text));
+            // Hide the option menu
+            invalidateOptionsMenu();
+        } else {
+            setTitle(getString(R.string.editor_activity_title_edit_product));
+            mImageText.setText(getString(R.string.change_image_text));
+            // Initialize the loader to read product data from the database
+            getLoaderManager().initLoader(EXISTING_PRODUCT_LOADER, null, this);
+        }
+
+        // Setup OnTouchListeners on all the input fields
+        mNameEditText.setOnTouchListener(mTouchListener);
+        mQuantityEditText.setOnTouchListener(mTouchListener);
+        mPriceEditText.setOnTouchListener(mTouchListener);
+        mSupplierEditText.setOnTouchListener(mTouchListener);
+        mSupplierEmailEditText.setOnTouchListener(mTouchListener);
+        mPlusButton.setOnTouchListener(mTouchListener);
+        mMinusButton.setOnTouchListener(mTouchListener);
+        mProductImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptOpenSelector();
+                mProductHasChanged = true;
+            }
+        });
+
     }
-
-    // Setup OnTouchListeners on all the input fields
-    mNameEditText.setOnTouchListener(mTouchListener);
-    mQuantityEditText.setOnTouchListener(mTouchListener);
-    mPriceEditText.setOnTouchListener(mTouchListener);
-    mPlusButton.setOnTouchListener(mTouchListener);
-    mMinusButton.setOnTouchListener(mTouchListener);
-    mProductImage.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            attemptOpenSelector();
-            mProductHasChanged = true;
-        }
-    });
-
-}
 
     public void attemptOpenSelector() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -135,8 +140,8 @@ protected void onCreate(Bundle savedInstanceState) {
 
     public void openImageSelector() {
         Intent selectionIntent;
-        if (Build.VERSION.SDK_INT <19) {
-            selectionIntent =  new Intent(Intent.ACTION_GET_CONTENT);
+        if (Build.VERSION.SDK_INT < 19) {
+            selectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
         } else {
             selectionIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             selectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -145,15 +150,15 @@ protected void onCreate(Bundle savedInstanceState) {
         startActivityForResult(Intent.createChooser(selectionIntent, getString(R.string.selectImage)), 0);
     }
 
-     @Override
-     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResult) {
-         switch (requestCode) {
-             case 1:
-                 if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
-                     openImageSelector();
-                 }
-         }
-     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResult) {
+        switch (requestCode) {
+            case 1:
+                if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
+                    openImageSelector();
+                }
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -201,7 +206,7 @@ protected void onCreate(Bundle savedInstanceState) {
     }
 
     private void showDeleteConfirmationDialog() {
-        AlertDialog.Builder builder =  new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.delete_dialog_msg);
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             @Override
@@ -234,6 +239,8 @@ protected void onCreate(Bundle savedInstanceState) {
         super.onPrepareOptionsMenu(menu);
         if (mCurrentProductUri == null) {
             MenuItem cancelItem = menu.findItem(R.id.action_delete);
+            MenuItem orderItem = menu.findItem(R.id.action_order);
+            orderItem.setVisible(false);
             cancelItem.setVisible(false);
         }
         return true;
@@ -245,7 +252,6 @@ protected void onCreate(Bundle savedInstanceState) {
             case R.id.action_save:
                 // Insert product in the database
                 saveProduct();
-                finish();
                 return true;
             case R.id.action_delete:
                 // Call delete dialog
@@ -274,10 +280,13 @@ protected void onCreate(Bundle savedInstanceState) {
     }
 
     public void orderProduct() {
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
         emailIntent.setType("text/plain");
+        emailIntent.setData(Uri.parse("mailto:" + mSupplierEmailEditText.getText().toString().trim()));
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Order " + mNameEditText.getText().toString().trim());
-        startActivity(emailIntent);
+        if (emailIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(emailIntent);
+        }
     }
 
     private void saveProduct() {
@@ -286,16 +295,18 @@ protected void onCreate(Bundle savedInstanceState) {
         String nameString = mNameEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
-
+        String supplierString = mSupplierEditText.getText().toString().trim();
+        String supplierEmailString = mSupplierEmailEditText.getText().toString().trim();
 
         // Check if it is a new product
         if (mCurrentProductUri == null &&
-            TextUtils.isEmpty(nameString) && TextUtils.isEmpty(quantityString) &&
-            TextUtils.isEmpty(priceString) && mImageUri == null) {
+                TextUtils.isEmpty(nameString) && TextUtils.isEmpty(quantityString) &&
+                TextUtils.isEmpty(priceString) && TextUtils.isEmpty(supplierString)
+                && TextUtils.isEmpty(supplierEmailString) && mImageUri == null) {
             return;
         }
         // Create a ContentValues object
-        ContentValues values =  new ContentValues();
+        ContentValues values = new ContentValues();
 
         if (TextUtils.isEmpty(nameString)) {
             Toast.makeText(this, R.string.name_needed_text, Toast.LENGTH_SHORT).show();
@@ -316,6 +327,18 @@ protected void onCreate(Bundle savedInstanceState) {
             return;
         } else {
             values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceString);
+        }
+
+        if (TextUtils.isEmpty(supplierString)) {
+            Toast.makeText(this, R.string.supplier_needed_text, Toast.LENGTH_SHORT).show();
+        } else {
+            values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER, supplierString);
+        }
+
+        if (TextUtils.isEmpty(supplierEmailString)) {
+            Toast.makeText(this, R.string.supplier_email_needed_text, Toast.LENGTH_SHORT).show();
+        } else {
+            values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL, supplierEmailString);
         }
 
         if (mImageUri == null) {
@@ -349,22 +372,23 @@ protected void onCreate(Bundle savedInstanceState) {
                         Toast.LENGTH_SHORT).show();
             }
         }
+        finish();
     }
 
-public void deleteProduct() {
-    if (mCurrentProductUri != null) {
-        int rowsDeleted = getContentResolver().delete(mCurrentProductUri, null, null);
-        if (rowsDeleted == 0) {
-            Toast.makeText(this, getString(R.string.editor_delete_product_failed),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            // Otherwise, the delete was successful and we can display a toast.
-            Toast.makeText(this, getString(R.string.editor_delete_product_successful),
-                    Toast.LENGTH_SHORT).show();
+    public void deleteProduct() {
+        if (mCurrentProductUri != null) {
+            int rowsDeleted = getContentResolver().delete(mCurrentProductUri, null, null);
+            if (rowsDeleted == 0) {
+                Toast.makeText(this, getString(R.string.editor_delete_product_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the delete was successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_delete_product_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
+        finish();
     }
-    finish();
-}
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
@@ -372,7 +396,9 @@ public void deleteProduct() {
                 ProductEntry.COLUMN_PRODUCT_NAME,
                 ProductEntry.COLUMN_PRODUCT_QUANTITY,
                 ProductEntry.COLUMN_PRODUCT_PRICE,
-                ProductEntry.COLUMN_PRODUCT_IMAGE };
+                ProductEntry.COLUMN_PRODUCT_SUPPLIER,
+                ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL,
+                ProductEntry.COLUMN_PRODUCT_IMAGE};
 
         return new CursorLoader(this,
                 mCurrentProductUri,
@@ -394,18 +420,24 @@ public void deleteProduct() {
             int nameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME);
             int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY);
             int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE);
+            int supplierColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+            int supplierEmailColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL);
             int imageColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_IMAGE);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
             quantity = cursor.getInt(quantityColumnIndex);
             String price = cursor.getString(priceColumnIndex);
+            String supplier = cursor.getString(supplierColumnIndex);
+            String supplierEmail = cursor.getString(supplierEmailColumnIndex);
             String imageUriString = cursor.getString(imageColumnIndex);
 
             // Update the views on the screen with the values from the database
             mNameEditText.setText(name);
             mQuantityEditText.setText(Integer.toString(quantity));
             mPriceEditText.setText(price);
+            mSupplierEditText.setText(supplier);
+            mSupplierEmailEditText.setText(supplierEmail);
             mImageUri = Uri.parse(imageUriString);
             mProductImage.setImageURI(mImageUri);
         }
@@ -416,6 +448,8 @@ public void deleteProduct() {
         mNameEditText.setText("");
         mQuantityEditText.setText("");
         mPriceEditText.setText("");
+        mSupplierEditText.setText("");
+        mSupplierEmailEditText.setText("");
 
     }
 }

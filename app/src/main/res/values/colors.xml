@@ -6,6 +6,7 @@
     <color name="nameColor">#2B3D4D</color>
     <color name="quantityColor">#AEB6BD</color>
     <color name="priceColor">#AEB6BD</color>
+    <color name="subtitleTextColor">#A2AAB0</color>
 
     <!-- Primary color for the editor -->
     <color name="editorColorPrimary">#2D3640</color>

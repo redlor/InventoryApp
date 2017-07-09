@@ -3,6 +3,17 @@
     <!-- Margin around the floating action button in InventoryActivity -->
     <dimen name="fab_margin">16dp</dimen>
 
+    <!-- List item height -->
+    <dimen name ="list_item_height">88dp</dimen>"
+
     <!-- Common margin value used throughout the app -->
     <dimen name="activity_margin">16dp</dimen>
+
+    <dimen name="button_padding">12dp</dimen>
+    <dimen name="button_margin">4dp</dimen>
+    <dimen name= "text_size_button">24sp</dimen>
+
+    <dimen name="cornerRadius">4dp</dimen>
+    <dimen name="side_margin_card">8dp</dimen>
+    <dimen name="card_margin">4dp</dimen>
 </resources>

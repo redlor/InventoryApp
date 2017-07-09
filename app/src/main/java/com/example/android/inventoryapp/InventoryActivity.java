@@ -10,12 +10,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.example.android.inventoryapp.data.ProductContract.ProductEntry;
 
@@ -24,6 +24,9 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
     private static final int PRODUCT_LOADER = 0;
 
     ProductCursorAdapter mCursorAdapter;
+    View emptyView;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,37 +43,34 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
             }
         });
 
-        // Find the ListView which will be populated with the product data
-        ListView productListView = (ListView) findViewById(R.id.list);
+        // Find the RecyclerView which will be populated with the product data
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mLayoutManager = new LinearLayoutManager(InventoryActivity.this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        View emptyView = findViewById(R.id.empty_view);
-        productListView.setEmptyView(emptyView);
+        emptyView = findViewById(R.id.empty_view);
 
         // Set the adapter
         mCursorAdapter = new ProductCursorAdapter(this, null);
-        productListView.setAdapter(mCursorAdapter);
-
-        // Setup the item click listener
-        productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(InventoryActivity.this, EditorActivity.class);
-
-                // Append the ID of the clicked product
-                Uri currentProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
-
-                // Set the URI on the data field of the intent
-                intent.setData(currentProductUri);
-
-                // Launch the activity
-                startActivity(intent);
-            }
-        });
+        mRecyclerView.setAdapter(mCursorAdapter);
 
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
     }
 
+
+    public void onItemClick(long id) {
+        Intent intent = new Intent(InventoryActivity.this, EditorActivity.class);
+
+        // Append the ID of the clicked product
+        Uri currentProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
+
+        // Set the URI on the data field of the intent
+        intent.setData(currentProductUri);
+
+        // Launch the activity
+        startActivity(intent);
+    }
 
     private void deleteAllProducts() {
         int rowsDeleted = getContentResolver().delete(ProductEntry.CONTENT_URI, null, null);
@@ -88,13 +88,12 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case  R.id.action_delete_all_entries:
+            case R.id.action_delete_all_entries:
                 deleteAllProducts();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -104,6 +103,8 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
                 ProductEntry.COLUMN_PRODUCT_NAME,
                 ProductEntry.COLUMN_PRODUCT_QUANTITY,
                 ProductEntry.COLUMN_PRODUCT_PRICE,
+                ProductEntry.COLUMN_PRODUCT_SUPPLIER,
+                ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL,
                 ProductEntry.COLUMN_PRODUCT_IMAGE};
 
         // Loader to execute the Content Provider's query
@@ -117,6 +118,11 @@ public class InventoryActivity extends AppCompatActivity implements LoaderManage
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
         mCursorAdapter.swapCursor(data);
     }
 

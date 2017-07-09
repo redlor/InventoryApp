@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.android.inventoryapp.data.ProductContract.ProductEntry;
+
 public class ProductProvider extends ContentProvider {
 
     public static final String LOG_TAG = ProductProvider.class.getSimpleName();
@@ -102,13 +103,12 @@ public class ProductProvider extends ContentProvider {
     }
 
     private Uri insertProduct(Uri uri, ContentValues values) {
-        // Check that the name is not null
+        // Check that the fileds are not null
         String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
         if (name == null) {
             throw new IllegalArgumentException("Product requires a name");
         }
 
-        // Check that the quantity is valid
         Integer quantity = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_QUANTITY);
         if (quantity != null && quantity < 0) {
             throw new IllegalArgumentException("Not valid quantity");
@@ -119,10 +119,20 @@ public class ProductProvider extends ContentProvider {
             throw new IllegalArgumentException("Not valid price");
         }
 
-  /*      String imageURi = values.getAsString(ProductEntry.COLUMN_PRODUCT_IMAGE);
+        String supplier = values.getAsString(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+        if (supplier == null) {
+            throw new IllegalArgumentException("Supplier required");
+        }
+
+        String supplierEmail = values.getAsString(ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL);
+        if (supplierEmail == null) {
+            throw new IllegalArgumentException("Supplier email required");
+        }
+
+        String imageURi = values.getAsString(ProductEntry.COLUMN_PRODUCT_IMAGE);
         if (imageURi == null) {
             throw new IllegalArgumentException("Product requires a picture");
-        }*/
+        }
 
         // Get writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
@@ -152,13 +162,13 @@ public class ProductProvider extends ContentProvider {
         switch (match) {
             case PRODUCTS:
                 // Delete all rows that match the selection and selection args
-                rowsDeleted =  database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case PRODUCT_ID:
                 // Delete a single row given by the ID in the URI
                 selection = ProductEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri))};
-                rowsDeleted =  database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
@@ -182,7 +192,7 @@ public class ProductProvider extends ContentProvider {
                 return updateProduct(uri, contentValues, selection, selectionArgs);
             case PRODUCT_ID:
                 selection = ProductEntry._ID + "=?";
-                selectionArgs =  new String[] {String.valueOf(ContentUris.parseId(uri))};
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 return updateProduct(uri, contentValues, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
